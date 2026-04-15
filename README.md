@@ -37,10 +37,9 @@ DataSource JNDI utilizado pela aplicação: `java:/DevDropsDS`.
 
 ## Diagramas (UML)
 
-- Classes: `docs/uml/class-diagram.svg`
-- Sequência (publicar drop): `docs/uml/sequence-publicar-drop.svg`
-- Componentes: `docs/uml/components.svg`
-- Deployment: `docs/uml/deployment.svg`
+### Diagrama de classes
+
+![Diagrama de classes](docs/uml/class-diagram.svg)
 
 ## Como rodar com Docker (recomendado)
 
