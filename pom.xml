@@ -15,6 +15,15 @@
     <maven.compiler.target>1.7</maven.compiler.target>
   </properties>
 
+  <repositories>
+    <!-- Legacy Facelets 1.1.15.B1 is not available in Maven Central -->
+    <repository>
+      <id>jboss-thirdparty-releases</id>
+      <name>JBoss Thirdparty Releases</name>
+      <url>https://repository.jboss.org/nexus/repository/thirdparty-releases/</url>
+    </repository>
+  </repositories>
+
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
