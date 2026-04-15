@@ -1,0 +1,18 @@
+sequenceDiagram
+  autonumber
+  actor U as Usuário
+  participant V as JSF View (index.xhtml)
+  participant B as DropBean
+  participant D as DropDAO
+  participant EM as EntityManager
+  participant DB as PostgreSQL
+
+  U->>V: Preenche título/conteúdo + Publicar
+  V->>B: action salvar()
+  B->>D: salvar(drop)
+  D->>EM: begin()
+  D->>EM: persist(drop)
+  EM->>DB: INSERT drop
+  DB-->>EM: OK
+  D->>EM: commit()
+  B-->>V: Atualiza lista

@@ -1,0 +1,41 @@
+.git
+.github
+.vscode
+target
+**/*.log
+**/*.tmp
+node_modules
+
+# Secrets and local env
+.env
+.env.*
+!.env.example
+*.secret
+*.secrets
+*.credentials
+*.token
+secrets/
+
+# Keys and certificates
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+*.crt
+*.cer
+*.csr
+id_rsa
+id_rsa.pub
+id_ed25519
+id_ed25519.pub
+
+# Local docker overrides and backups
+docker-compose.override.yml
+docker-compose.*.override.yml
+*.bak
+*.backup
+*.old
+*.sql
+*.dump

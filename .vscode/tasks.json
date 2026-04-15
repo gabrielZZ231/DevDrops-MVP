@@ -1,0 +1,128 @@
+{
+  "version": "2.0.0",
+  "inputs": [
+    {
+      "id": "jbossHome",
+      "type": "promptString",
+      "description": "JBOSS_HOME (ex: C:\\jboss-5.1.0.GA)",
+      "default": "C:\\servidores\\jboss-5.1.0.GA\\jboss-5.1.0.GA"
+    },
+    {
+      "id": "jdk8Home",
+      "type": "promptString",
+      "description": "JDK8_HOME (recomendado; para compilar com -source/-target 1.7). Pode ficar vazio se você usar o profile -Ptoolchain com ~/.m2/toolchains.xml",
+      "default": ""
+    },
+    {
+      "id": "jdk7Home",
+      "type": "promptString",
+      "description": "JDK7_HOME (obrigatório para rodar o JBoss 5.1)",
+      "default": ""
+    }
+  ],
+  "tasks": [
+    {
+      "label": "DevDrops: Provision JBoss (DS + drivers + Facelets)",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "$ErrorActionPreference='Stop'; . '${workspaceFolder}\\scripts\\load-dotenv.ps1'; & '${workspaceFolder}\\scripts\\provision-jboss.ps1'"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "DevDrops: Build WAR (Java 8 / target 1.7)",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "$ErrorActionPreference='Stop'; . '${workspaceFolder}\\scripts\\load-dotenv.ps1'; $jdk8='${input:jdk8Home}'; if ($env:JDK8_HOME) { $jdk8=$env:JDK8_HOME }; if ($jdk8) { $javac=Join-Path $jdk8 'bin\\javac.exe'; if (!(Test-Path $javac)) { throw ('JDK8_HOME inválido (javac.exe não encontrado): ' + $javac) }; $env:JAVA_HOME=$jdk8; $env:Path=\"$env:JAVA_HOME\\bin;$env:Path\" }; mvn -U clean package"
+      ],
+      "group": "build",
+      "problemMatcher": [
+        "$javac"
+      ]
+    },
+    {
+      "label": "DevDrops: Deploy WAR to JBoss",
+      "type": "shell",
+      "command": "powershell",
+      "dependsOn": [
+        "DevDrops: Build WAR (Java 8 / target 1.7)",
+        "DevDrops: Provision JBoss (DS + drivers + Facelets)"
+      ],
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "$ErrorActionPreference='Stop'; . '${workspaceFolder}\\scripts\\load-dotenv.ps1'; $jboss='${input:jbossHome}'; if ($env:JBOSS_HOME) { $jboss=$env:JBOSS_HOME }; if ([string]::IsNullOrWhiteSpace($jboss)) { throw 'JBOSS_HOME missing (set in .env or via task input)' }; $war='${workspaceFolder}\\target\\devdrops.war'; $dest=Join-Path $jboss 'server\\default\\deploy\\devdrops.war'; if (!(Test-Path $war)) { throw 'WAR not found. Run build first.' }; Copy-Item -Force $war $dest; Write-Host ('Deployed to: ' + $dest)"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "DevDrops: Start JBoss (default)",
+      "type": "shell",
+      "command": "powershell",
+      "dependsOn": "DevDrops: Provision JBoss (DS + drivers + Facelets)",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "$ErrorActionPreference='Stop'; . '${workspaceFolder}\\scripts\\load-dotenv.ps1'; $jboss='${input:jbossHome}'; if ($env:JBOSS_HOME) { $jboss=$env:JBOSS_HOME }; $jdk7='${input:jdk7Home}'; if ($env:JDK7_HOME) { $jdk7=$env:JDK7_HOME }; & '${workspaceFolder}\\scripts\\start-jboss.ps1' -JbossHome $jboss -Jdk7Home $jdk7"
+      ],
+      "isBackground": true,
+      "problemMatcher": []
+    },
+    {
+      "label": "DevDrops: Start JBoss (debug 8787)",
+      "type": "shell",
+      "command": "powershell",
+      "dependsOn": "DevDrops: Provision JBoss (DS + drivers + Facelets)",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "$ErrorActionPreference='Stop'; . '${workspaceFolder}\\scripts\\load-dotenv.ps1'; $jboss='${input:jbossHome}'; if ($env:JBOSS_HOME) { $jboss=$env:JBOSS_HOME }; $jdk7='${input:jdk7Home}'; if ($env:JDK7_HOME) { $jdk7=$env:JDK7_HOME }; & '${workspaceFolder}\\scripts\\start-jboss.ps1' -JbossHome $jboss -Jdk7Home $jdk7 -Debug"
+      ],
+      "isBackground": true,
+      "problemMatcher": []
+    },
+    {
+      "label": "DevDrops: Tail JBoss server.log",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "$ErrorActionPreference='Stop'; . '${workspaceFolder}\\scripts\\load-dotenv.ps1'; $jboss='${input:jbossHome}'; if ($env:JBOSS_HOME) { $jboss=$env:JBOSS_HOME }; $log=Join-Path $jboss 'server\\default\\log\\server.log'; if (!(Test-Path $log)) { throw ('Log not found: ' + $log) }; Get-Content -Path $log -Wait -Tail 200"
+      ],
+      "isBackground": true,
+      "problemMatcher": []
+    },
+    {
+      "label": "DevDrops: Requirements check (no JPA2 / Java8 syntax)",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "$ErrorActionPreference='Stop'; $root='${workspaceFolder}'; $javaHits=Select-String -Path (Join-Path $root 'src\\main\\java\\**\\*.java') -Pattern 'TypedQuery|createQuery\\(\\s*\"[^\"]+\"\\s*,|java\\.util\\.stream' -AllMatches -ErrorAction SilentlyContinue; $xhtmlHits=Select-String -Path (Join-Path $root 'src\\main\\webapp\\**\\*.xhtml') -Pattern '<\\s*h:head\\b|<\\s*h:body\\b' -AllMatches -ErrorAction SilentlyContinue; if ($javaHits -or $xhtmlHits) { if($javaHits){ $javaHits | ForEach-Object { $_.Path + ':' + $_.LineNumber + ' ' + $_.Line.Trim() } }; if($xhtmlHits){ $xhtmlHits | ForEach-Object { $_.Path + ':' + $_.LineNumber + ' ' + $_.Line.Trim() } }; exit 1 } else { Write-Host 'OK: sem JPA 2.0 TypedQuery/createQuery(String,Class), sem Streams, e sem <h:head>/<h:body> (JSF 2.x) nas views.' }"
+      ],
+      "problemMatcher": []
+    }
+  ]
+}

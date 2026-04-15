@@ -1,0 +1,22 @@
+flowchart LR
+  subgraph Web[Camada Web]
+    X["index.xhtml (Facelets)"]
+    F["FacesServlet (*.xhtml)"]
+  end
+
+  subgraph App[Camada de Aplicação]
+    B["DropBean (Managed Bean)"]
+  end
+
+  subgraph Persistence[Camada de Persistência]
+    DAO[DropDAO]
+    JPA[JPAUtil]
+    PU[(persistence.xml)]
+  end
+
+  subgraph Infra[Infra]
+    DS["java:/DevDropsDS (JBoss DataSource)"]
+    PG["PostgreSQL devdrops_db"]
+  end
+
+  X --> F --> B --> DAO --> JPA --> PU --> DS --> PG

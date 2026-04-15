@@ -1,0 +1,67 @@
+# Maven
+/target/
+
+# Java
+*.class
+*.log
+hs_err_pid*
+
+# IDEs
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/*
+!.vscode/tasks.json
+!.vscode/launch.json
+
+# Eclipse
+.project
+.classpath
+.settings/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets / local overrides
+.env
+.env.*
+!.env.example
+
+# Secrets (keys/certs/tokens)
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+*.crt
+*.cer
+*.csr
+id_rsa
+id_rsa.pub
+id_ed25519
+id_ed25519.pub
+
+# Local secret/config variants
+*.secret
+*.secrets
+*.credentials
+*.token
+secrets/
+
+# Docker local overrides
+docker-compose.override.yml
+docker-compose.*.override.yml
+
+# Backup/dump files (may contain sensitive data)
+*.bak
+*.backup
+*.old
+*.sql
+*.dump
+
+# Local config files (keep *.example.* in repo)
+*.local.*
+jboss/*-ds.local.xml

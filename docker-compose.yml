@@ -1,0 +1,43 @@
+services:
+  db:
+    image: postgres:16
+    container_name: devdrops-db
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      POSTGRES_DB: ${DEV_DROPS_DB_NAME}
+      POSTGRES_USER: ${DEV_DROPS_DB_USER}
+      POSTGRES_PASSWORD: ${DEV_DROPS_DB_PASSWORD}
+    ports:
+      - "${DEV_DROPS_DB_PORT:-5432}:5432"
+    volumes:
+      - devdrops-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -U ${DEV_DROPS_DB_USER} -d ${DEV_DROPS_DB_NAME}
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: devdrops-app
+    restart: unless-stopped
+    environment:
+      DEV_DROPS_DB_HOST: db
+      DEV_DROPS_DB_PORT: 5432
+      DEV_DROPS_DB_NAME: ${DEV_DROPS_DB_NAME}
+      DEV_DROPS_DB_USER: ${DEV_DROPS_DB_USER}
+      DEV_DROPS_DB_PASSWORD: ${DEV_DROPS_DB_PASSWORD}
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+
+volumes:
+  devdrops-postgres-data:

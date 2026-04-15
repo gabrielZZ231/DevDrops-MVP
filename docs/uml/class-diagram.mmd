@@ -1,0 +1,29 @@
+classDiagram
+  direction LR
+
+  class Usuario {
+    Long id
+    String nome
+    String email
+    String senha
+  }
+
+  class Drop {
+    Long id
+    String titulo
+    String conteudo
+    Date dataPublicacao
+  }
+
+  class DropDAO {
+    +salvar(Drop drop)
+    +listar() List~Drop~
+  }
+
+  class JPAUtil {
+    +getEntityManager() EntityManager
+  }
+
+  Usuario "1" <-- "*" Drop : autor
+  DropDAO ..> JPAUtil : usa
+  DropDAO ..> Drop : persiste
