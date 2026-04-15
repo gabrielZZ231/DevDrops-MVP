@@ -39,7 +39,11 @@ DataSource JNDI utilizado pela aplicação: `java:/DevDropsDS`.
 
 ### Diagrama de classes
 
-![Diagrama de classes](docs/uml/class-diagram.svg)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/uml/class-diagram-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="docs/uml/class-diagram-light.svg">
+  <img alt="Diagrama de classes" src="docs/uml/class-diagram-light.svg">
+</picture>
 
 ## Como rodar com Docker (recomendado)
 

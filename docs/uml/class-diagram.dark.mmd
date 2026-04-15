@@ -1,3 +1,12 @@
+%%{init: {"theme": "base", "themeVariables": {
+  "fontFamily": "Segoe UI, Arial, sans-serif",
+  "primaryColor": "#0f172a",
+  "primaryBorderColor": "#cbd5e1",
+  "primaryTextColor": "#e5e7eb",
+  "lineColor": "#cbd5e1",
+  "tertiaryColor": "#111827",
+  "background": "transparent"
+}}}%%
 classDiagram
   direction TB
 
@@ -27,4 +36,3 @@ classDiagram
   Usuario "1" <-- "0..*" Drop : autor
   DropDAO ..> Drop : persiste
   DropDAO ..> JPAUtil : obtem EntityManager
-
